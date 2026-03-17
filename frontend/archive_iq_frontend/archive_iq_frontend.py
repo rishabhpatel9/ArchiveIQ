@@ -2,7 +2,7 @@ import reflex as rx
 from rxconfig import config
 
 class GlobalState(rx.State):
-    """The app state."""
+    # The app state.
     notebooks: list[str] = ["Research on AI Agents", "Project ArchiveIQ Docs", "Machine Learning Notes"]
 
 def index() -> rx.Component:
@@ -27,7 +27,7 @@ def index() -> rx.Component:
             
             # Recent Section
             rx.vstack(
-                rx.heading("Recent Notebooks", size="7", weight="bold", mb="4"),
+                rx.heading("Recent Notebooks", size="5", weight="bold", mb="4"),
                 rx.grid(
                     rx.foreach(
                         GlobalState.notebooks,
@@ -73,4 +73,4 @@ app = rx.App(
         accent_color="indigo",
     ),
 )
-app.add_page(index)
+app.add_page(index, title="ArchiveIQ")
