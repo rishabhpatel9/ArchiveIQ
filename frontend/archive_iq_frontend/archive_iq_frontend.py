@@ -10,6 +10,12 @@ class GlobalState(rx.State):
     notebook_view_mode: str = "Per Notebook"
     global_view_style: str = "Image+Title"
 
+    def set_notebook_view_mode(self, mode: str):
+        self.notebook_view_mode = mode
+
+    def set_global_view_style(self, style: str):
+        self.global_view_style = style
+
     def toggle_settings(self):
         self.show_settings = not self.show_settings
 
