@@ -10,11 +10,13 @@ class GlobalState(rx.State):
     notebook_view_mode: str = "Per Notebook"
     global_view_style: str = "Image+Title"
 
-    def set_notebook_view_mode(self, mode: str):
-        self.notebook_view_mode = mode
+    def set_notebook_view_mode(self, mode: str | list[str]):
+        if isinstance(mode, str):
+            self.notebook_view_mode = mode
 
-    def set_global_view_style(self, style: str):
-        self.global_view_style = style
+    def set_global_view_style(self, style: str | list[str]):
+        if isinstance(style, str):
+            self.global_view_style = style
 
     def toggle_settings(self):
         self.show_settings = not self.show_settings
@@ -27,8 +29,9 @@ def settings_dialog() -> rx.Component:
             rx.vstack(
                 rx.hstack(
                     rx.text("Notebooks Tile View", width="280px"),
-                    rx.select(
-                        ["Per Notebook", "Apply to all"],
+                    rx.segmented_control.root(
+                        rx.segmented_control.item("Per Notebook", value="Per Notebook"),
+                        rx.segmented_control.item("Apply to all", value="Apply to all"),
                         value=GlobalState.notebook_view_mode,
                         on_change=GlobalState.set_notebook_view_mode,
                     ),
@@ -40,8 +43,9 @@ def settings_dialog() -> rx.Component:
                     GlobalState.notebook_view_mode == "Apply to all",
                     rx.hstack(
                         rx.text("Global View Style", width="280px"),
-                        rx.select(
-                            ["Image+Title", "Title"],
+                        rx.segmented_control.root(
+                            rx.segmented_control.item("Image+Title", value="Image+Title"),
+                            rx.segmented_control.item("Title", value="Title"),
                             value=GlobalState.global_view_style,
                             on_change=GlobalState.set_global_view_style,
                         ),
@@ -157,6 +161,66 @@ def navbar() -> rx.Component:
         )
     )
 
+def notebook_card(title: str) -> rx.Component:
+    return rx.cond(
+        GlobalState.global_view_style == "Image+Title",
+        # Style 1: Image + Title (Card with Image at Top)
+        rx.card(
+            rx.vstack(
+                rx.box(
+                    rx.image(
+                        src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&q=80&w=400&h=200",
+                        width="100%",
+                        height="120px",
+                        object_fit="cover",
+                        border_radius="8px",
+                    ),
+                    width="100%",
+                ),
+                rx.text(title, weight="bold", size="3", mt="2"),
+                rx.text("Last updated Mar 17, 2026", size="1", color=rx.color("gray", 10)),
+                align="start",
+                width="100%",
+            ),
+            width="100%",
+            padding="1em",
+            cursor="pointer",
+            _hover={"transform": "translateY(-2px)", "transition": "transform 0.2s"},
+        ),
+        # Style 2: Title Only (Minimalist, like NotebookLM)
+        rx.card(
+            rx.vstack(
+                rx.hstack(
+                    rx.box(
+                        rx.icon("book-text", size=24, color=rx.color("indigo", 9)),
+                        padding="0.5em",
+                        background=rx.color("indigo", 3),
+                        border_radius="8px",
+                    ),
+                    width="100%",
+                    align="center",
+                ),
+                rx.box(height="auto"),
+                rx.heading(title, size="5", weight="bold", line_clamp=2),
+                rx.spacer(),
+                rx.hstack(
+                    rx.text("Mar 17, 2026", size="1"),
+                    rx.text("•", size="1"),
+                    rx.text("3 sources", size="1"),
+                    color=rx.color("gray", 10),
+                    spacing="2",
+                ),
+                align="start",
+                width="100%",
+                height="150px",  # Fixed height for title-only cards
+            ),
+            variant="surface",
+            width="100%",
+            cursor="pointer",
+            _hover={"background": rx.color("indigo", 2), "transition": "background 0.2s"},
+        )
+    )
+
 def index() -> rx.Component:
     return rx.box(
         navbar(),
@@ -184,27 +248,9 @@ def index() -> rx.Component:
                 rx.grid(
                     rx.foreach(
                         GlobalState.notebooks,
-                        lambda nb: rx.card(
-                            rx.vstack(
-                                rx.box(
-                                    rx.image(
-                                        src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&q=80&w=400&h=200",
-                                        width="100%",
-                                        height="120px",
-                                        object_fit="cover",
-                                        border_radius="8px",
-                                    ),
-                                    width="100%",
-                                ),
-                                rx.text(nb, weight="bold", size="3", mt="2"),
-                                align="start",
-                                width="100%",
-                            ),
-                            width="100%",
-                            padding="1em",
-                        )
+                        notebook_card
                     ),
-                    columns=rx.breakpoints(initial="1", sm="2", md="3"),
+                    columns=rx.breakpoints(initial="1", sm="2", md="3", lg="4"),
                     spacing="6",
                     width="100%",
                 ),
