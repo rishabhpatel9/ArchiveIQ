@@ -17,7 +17,7 @@ def settings_dialog() -> rx.Component:
     return rx.dialog.root(
         rx.dialog.content(
             rx.dialog.title("Settings", text_align="center"),
-            rx.divider(mt="4", mb="6"),
+            rx.box(height="1em"),
             rx.vstack(
                 rx.hstack(
                     rx.text("Notebooks Tile View", width="280px"),
