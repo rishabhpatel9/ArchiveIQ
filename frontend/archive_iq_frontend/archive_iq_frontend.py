@@ -5,6 +5,10 @@ class GlobalState(rx.State):
     # The app state.
     notebooks: list[str] = ["Research on AI Agents", "Project ArchiveIQ Docs", "Machine Learning Notes"]
     show_settings: bool = False
+    
+    # New settings
+    notebook_view_mode: str = "Per Notebook"
+    global_view_style: str = "Image+Title"
 
     def toggle_settings(self):
         self.show_settings = not self.show_settings
@@ -15,6 +19,31 @@ def settings_dialog() -> rx.Component:
             rx.dialog.title("Settings", text_align="center"),
             rx.divider(mt="4", mb="6"),
             rx.vstack(
+                rx.hstack(
+                    rx.text("Notebooks Tile View", width="280px"),
+                    rx.select(
+                        ["Per Notebook", "Apply to all"],
+                        value=GlobalState.notebook_view_mode,
+                        on_change=GlobalState.set_notebook_view_mode,
+                    ),
+                    width="100%",
+                    align="center",
+                    justify="between",
+                ),
+                rx.cond(
+                    GlobalState.notebook_view_mode == "Apply to all",
+                    rx.hstack(
+                        rx.text("Global View Style", width="280px"),
+                        rx.select(
+                            ["Image+Title", "Title"],
+                            value=GlobalState.global_view_style,
+                            on_change=GlobalState.set_global_view_style,
+                        ),
+                        width="100%",
+                        align="center",
+                        justify="between",
+                    ),
+                ),
                 rx.hstack(
                     rx.text("Notebooks Library Path", width="280px"),
                     rx.input(placeholder="/path/to/your/documents", width="100%"),
