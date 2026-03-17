@@ -28,33 +28,6 @@ def settings_dialog() -> rx.Component:
             rx.box(height="1em"),
             rx.vstack(
                 rx.hstack(
-                    rx.text("Notebooks Tile View", width="280px"),
-                    rx.segmented_control.root(
-                        rx.segmented_control.item("Per Notebook", value="Per Notebook"),
-                        rx.segmented_control.item("Apply to all", value="Apply to all"),
-                        value=GlobalState.notebook_view_mode,
-                        on_change=GlobalState.set_notebook_view_mode,
-                    ),
-                    width="100%",
-                    align="center",
-                    justify="between",
-                ),
-                rx.cond(
-                    GlobalState.notebook_view_mode == "Apply to all",
-                    rx.hstack(
-                        rx.text("Global View Style", width="280px"),
-                        rx.segmented_control.root(
-                            rx.segmented_control.item("Image+Title", value="Image+Title"),
-                            rx.segmented_control.item("Title", value="Title"),
-                            value=GlobalState.global_view_style,
-                            on_change=GlobalState.set_global_view_style,
-                        ),
-                        width="100%",
-                        align="center",
-                        justify="between",
-                    ),
-                ),
-                rx.hstack(
                     rx.text("Notebooks Library Path", width="280px"),
                     rx.input(placeholder="/path/to/your/documents", width="100%"),
                     width="100%",
@@ -119,6 +92,17 @@ def settings_dialog() -> rx.Component:
 
 def navbar() -> rx.Component:
     return rx.box(
+        rx.html("""
+            <style>
+                .rt-SegmentedControlItem[data-state='on'] {
+                    background-color: var(--indigo-9) !important;
+                    color: white !important;
+                }
+                .rt-SegmentedControlItem[data-state='on']:hover {
+                    background-color: var(--indigo-10) !important;
+                }
+            </style>
+        """),
         rx.hstack(
             rx.menu.root(
                 rx.menu.trigger(
@@ -131,24 +115,75 @@ def navbar() -> rx.Component:
                     ),
                 ),
                 rx.menu.content(
-                    rx.menu.item(
+                    # Quick Setting: Dark Mode
+                    rx.box(
                         rx.hstack(
-                            rx.icon("moon", size=16),
-                            rx.text("Dark Mode"),
+                            rx.icon("moon", size=15),
+                            rx.text("Dark Mode", size="2"),
                             rx.spacer(),
                             rx.switch(
                                 checked=rx.color_mode == "dark",
                                 on_change=rx.toggle_color_mode,
+                                size="1",
                             ),
                             width="100%",
+                            align="center",
                         ),
-                        close_on_select=False,
+                        padding_x="12px",
+                        padding_y="8px",
                     ),
                     rx.menu.separator(),
+                    # Quick Setting: View Modes
+                    rx.box(
+                        rx.vstack(
+                            rx.hstack(
+                                rx.icon("layout-grid", size=15),
+                                rx.text("Notebooks View", size="2"),
+                                rx.spacer(),
+                                rx.segmented_control.root(
+                                    rx.segmented_control.item("Per NB", value="Per Notebook"),
+                                    rx.segmented_control.item("All", value="Apply to all"),
+                                    value=GlobalState.notebook_view_mode,
+                                    on_change=GlobalState.set_notebook_view_mode,
+                                    size="1",
+                                    color_scheme="indigo",
+                                    high_contrast=True,
+                                ),
+                                width="100%",
+                                align="center",
+                            ),
+                            rx.cond(
+                                GlobalState.notebook_view_mode == "Apply to all",
+                                rx.hstack(
+                                    rx.icon("palette", size=15),
+                                    rx.text("Global Style", size="1"),
+                                    rx.spacer(),
+                                    rx.segmented_control.root(
+                                        rx.segmented_control.item("Image", value="Image+Title"),
+                                        rx.segmented_control.item("Text", value="Title"),
+                                        value=GlobalState.global_view_style,
+                                        on_change=GlobalState.set_global_view_style,
+                                        size="1",
+                                        color_scheme="indigo",
+                                        high_contrast=True,
+                                    ),
+                                    width="100%",
+                                    align="center",
+                                    mt="1",
+                                ),
+                            ),
+                            align_items="start",
+                            width="100%",
+                        ),
+                        padding_x="12px",
+                        padding_y="8px",
+                    ),
+                    rx.menu.separator(),
+                    # Final Action: Full Settings
                     rx.menu.item(
                         rx.hstack(
-                            rx.icon("sliders-vertical", size=16),
-                            rx.text("Settings"),
+                            rx.icon("sliders-vertical", size=15),
+                            rx.text("Settings", size="2"),
                         ),
                         on_click=GlobalState.toggle_settings,
                     ),
