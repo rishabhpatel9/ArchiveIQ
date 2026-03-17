@@ -1,0 +1,9 @@
+[project]
+name = "archive_iq_frontend"
+version = "0.1.0"
+description = "Web Interface for ArchiveIQ"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "reflex>=0.8.28",
+]
