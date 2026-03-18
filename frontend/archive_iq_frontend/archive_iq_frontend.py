@@ -1,5 +1,10 @@
 import reflex as rx
 from rxconfig import config
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from the root directory
+load_dotenv(os.path.join(os.path.dirname(__file__), "../../.env"))
 
 class GlobalState(rx.State):
     # The app state.
@@ -9,6 +14,7 @@ class GlobalState(rx.State):
     # New settings
     notebook_view_mode: str = "Per Notebook"
     global_view_style: str = "Image+Title"
+    notebook_library_path: str = os.getenv("NOTEBOOK_LIBRARY_PATH", "D:\\Studies\\Self\\ArchiveIQ\\data")
 
     def set_notebook_view_mode(self, mode: str | list[str]):
         if isinstance(mode, str):
@@ -21,6 +27,9 @@ class GlobalState(rx.State):
     def toggle_settings(self):
         self.show_settings = not self.show_settings
 
+    def set_library_path(self, path: str):
+        self.notebook_library_path = path
+
 def settings_dialog() -> rx.Component:
     return rx.dialog.root(
         rx.dialog.content(
@@ -29,7 +38,12 @@ def settings_dialog() -> rx.Component:
             rx.vstack(
                 rx.hstack(
                     rx.text("Notebooks Library Path", width="280px"),
-                    rx.input(placeholder="/path/to/your/documents", width="100%"),
+                    rx.input(
+                        value=GlobalState.notebook_library_path,
+                        on_change=GlobalState.set_library_path,
+                        placeholder="/path/to/your/documents",
+                        width="100%"
+                    ),
                     width="100%",
                     align="center",
                     justify="between",
@@ -74,7 +88,7 @@ def settings_dialog() -> rx.Component:
                 spacing="4",
                 width="100%",
             ),
-            rx.box(height="1em"),
+            rx.box(height="1.5em"),
             rx.hstack(
                 rx.dialog.close(
                     rx.button("Save Changes", color_scheme="indigo"),
