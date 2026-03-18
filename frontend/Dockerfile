@@ -8,10 +8,14 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Install uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:$PATH"
+
+COPY pyproject.toml uv.lock ./
+RUN uv sync --no-dev
 
 COPY . .
 
 EXPOSE 3000
-CMD ["reflex", "run", "--env", "prod", "--frontend-port", "3000"]
+CMD ["uv", "run", "reflex", "run", "--env", "prod", "--frontend-port", "3000"]
