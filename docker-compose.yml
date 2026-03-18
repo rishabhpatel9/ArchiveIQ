@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  archiveiq-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file: .env
+    volumes:
+      - ${NOTEBOOK_LIBRARY_PATH:-./data}:/app/data
+    ports:
+      - "${BACKEND_PORT:-5678}:5678"
+    environment:
+      - NOTEBOOK_LIBRARY_PATH=/app/data
+
+  archiveiq-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    env_file: .env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - archiveiq-backend
